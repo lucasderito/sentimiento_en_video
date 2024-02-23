@@ -5,19 +5,24 @@ import mediapipe as mp
 
 # Declaramos la deteccion de rostros
 detros = mp.solutions.face_detection
-rostros = detros.FaceDetection(min_detection_confidence= 0.8, model_selection=0)
+rostros = detros.FaceDetection(min_detection_confidence=0.8, model_selection=0)
 # Dibujo
 dibujorostro = mp.solutions.drawing_utils
 
 # Realizamos VideoCaptura
-cap = cv2.VideoCapture(1)
+#cap = cv2.VideoCapture(0)
+
+# Reemplaza la línea de captura de cámara web con la ruta de tu video
+video_path = 'videos/enojo1.mp4'
+cap = cv2.VideoCapture(video_path)
+
 
 # Empezamos
 while True:
     # Leemos los fotogramas
     ret, frame = cap.read()
     # Leemos imagen
-    img =cv2.imread("img.png")
+    img = cv2.imread("img.png")
     img = cv2.resize(img, (0, 0), None, 0.18, 0.18)
     ani, ali, c = img.shape
 
@@ -39,10 +44,10 @@ while True:
 
             # Dibujamos
             cv2.rectangle(frame, (xi, yi), (xf, yf), (255, 255, 0), 1)
-            frame[10:ani + 10, 10:ali+10] = img
+            frame[10:ani + 10, 10:ali + 10] = img
 
             # Informacion
-            info = DeepFace.analyze(rgb, actions=['age', 'gender', 'race', 'emotion'], enforce_detection= False)
+            info = DeepFace.analyze(rgb, actions=['age', 'gender', 'race', 'emotion'], enforce_detection=False)
 
             # Edad
             edad = info['age']
@@ -55,6 +60,7 @@ while True:
 
             # Genero
             gen = info['gender']
+
             #print(str(gen) + " de " + str(edad) + " años de edad, con estado de animo " + str(emociones) + " de etnia " + str(race))
 
             # Traducimos
@@ -133,9 +139,13 @@ while True:
     # Mostramos los fotogramas
     cv2.imshow(" Deteccion de Edad ", frame)
 
-    # Leemos el teclado
+    # Leemos el teclado para ver si apretamos la tecla escape, este valor aumentado puede aliviar
+    # la carga del cpu al reducir la frecuencia con la que el bucle principal del programa
+    # se ejecuta y realiza el procesamiento. un mayor tiempo de espera da mas margen de tiempo
+    # entre cada iteracion del bucle.
+
     t = cv2.waitKey(5)
-    if t == 27:
+    if t == 27: # ascii de la tecla escape
         break
 
 cv2.destroyAllWindows()
